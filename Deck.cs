@@ -41,6 +41,15 @@
         return a;
     }
 
+    public void Show(Deck deck)
+    {
+        for (int i = 0; i < deck.cards.Count(); i++)
+        {
+            Console.Write(deck.cards[i].ToString());
+            Console.WriteLine();
+        }
+    }
+
     public Deck(IList<string> symbol, IList<char> sign)
     {
         for (int i = 0; i < symbol.Count(); i++)

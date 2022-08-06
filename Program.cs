@@ -8,25 +8,31 @@ var sign = new char[] { 'A', '2', '3', '4', '5', '6', '7', '8', '9', '1', 'J', '
 
 Deck bicycle = new Deck(symbol, sign);
 
+Console.WriteLine("You have a deck of cards. What would you like to do with it?");
+Console.WriteLine("Write \"shuffle\" in order to shuffle the deck and \"pick\" if you'd like to pick out a card.");
+string answer = Console.ReadLine();
+int number;
+if(answer == "shuffle")
 {
-    //for (int i = 0; i < 10; i++)
-    {
+    Console.WriteLine("How many times would you like to shuffle?");
+    number = Convert.ToInt32(Console.ReadLine());
+    for (int i = 0; i < number; i++)
         bicycle.Shuffle();
-    }
+}
 
-    int number = Convert.ToInt32(Console.ReadLine());
-    bicycle.Pick(number);
-
-    for (int i = 0; i < bicycle.cards.Count(); i++)
+if(answer == "pick")
+{
+    Console.WriteLine("How many times would you like to pick a card?");
+    number = Convert.ToInt32(Console.ReadLine());
+    for (int i = 0; i < number; i++)
     {
-        Console.Write(bicycle.cards[i].ToString());
-        Console.WriteLine();
+        Console.WriteLine("Which card would you like to pick?");
+        int choice = Convert.ToInt32(Console.ReadLine());
+        bicycle.Pick(choice);
     }
 }
 
-var karta = new Card(symbol[1], sign[1], 1);
-
-Console.Write(karta.back);
+bicycle.Show(bicycle);
 
 public class Card
 {
