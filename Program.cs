@@ -6,32 +6,51 @@ symbol.Add("spades");
 
 var sign = new char[] { 'A', '2', '3', '4', '5', '6', '7', '8', '9', '1', 'J', 'Q', 'K'};
 
+string answer = "0";
+int number;
+
 Deck bicycle = new Deck(symbol, sign);
 
-Console.WriteLine("You have a deck of cards. What would you like to do with it?");
-Console.WriteLine("Write \"shuffle\" in order to shuffle the deck and \"pick\" if you'd like to pick out a card.");
-string answer = Console.ReadLine();
-int number;
-if(answer == "shuffle")
+while (answer != "done")
 {
-    Console.WriteLine("How many times would you like to shuffle?");
-    number = Convert.ToInt32(Console.ReadLine());
-    for (int i = 0; i < number; i++)
-        bicycle.Shuffle();
-}
-
-if(answer == "pick")
-{
-    Console.WriteLine("How many times would you like to pick a card?");
-    number = Convert.ToInt32(Console.ReadLine());
-    for (int i = 0; i < number; i++)
+    Console.WriteLine("You have a deck of cards. What would you like to do with it?");
+    Console.WriteLine("Write:");
+    Console.WriteLine("\"shuffle\" to shuffle the deck,");
+    Console.WriteLine("\"pick\" to pick out a card,");
+    Console.WriteLine("\"show\" to see the deck,");
+    Console.WriteLine("\"done\" to finish playing.");
+    switch (answer = Console.ReadLine())
     {
-        Console.WriteLine("Which card would you like to pick?");
-        int choice = Convert.ToInt32(Console.ReadLine());
-        bicycle.Pick(choice);
+        case "shuffle":
+            Console.WriteLine("How many times would you like to shuffle?");
+            number = Convert.ToInt32(Console.ReadLine());
+            for (int i = 0; i < number; i++)
+                bicycle.Shuffle();
+            break;
+
+        case "pick":
+            Console.WriteLine("How many times would you like to pick a card?");
+            number = Convert.ToInt32(Console.ReadLine());
+            for (int i = 0; i < number; i++)
+            {
+                Console.WriteLine("Which card would you like to pick?");
+                int choice = Convert.ToInt32(Console.ReadLine());
+                bicycle.Pick(choice);
+            }
+            break;
+
+        case "show":
+            bicycle.Show(bicycle);
+            break;
+
+
+        default:
+            Console.WriteLine("Incorrect command. Please try again");
+            break;
     }
 }
 
+Console.WriteLine("This is your deck.");
 bicycle.Show(bicycle);
 
 public class Card
