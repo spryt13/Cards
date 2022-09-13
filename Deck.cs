@@ -40,6 +40,12 @@
         cards.Remove(a);
         return a;
     }
+    static public Card Pick(IList<Card> cards, int number)
+    {
+        Card a = cards[number - 1];
+        cards.Remove(a);
+        return a;
+    }
 
     public void Show(Deck deck)
     {
@@ -49,6 +55,16 @@
             Console.WriteLine();
         }
     }
+
+    static public void Show(List<Card> deck)
+    {
+        for (int i = 0; i < deck.Count(); i++)
+        {
+            Console.Write(deck[i].ToString());
+            Console.WriteLine();
+        }
+    }
+
 
     public Deck(IList<string> symbol, IList<char> sign)
     {
