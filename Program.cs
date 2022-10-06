@@ -25,6 +25,7 @@ while (answer != "done")
 
     string? isNull = Console.ReadLine();
     answer = isNull!;
+    //answer = ReadAny();
 
     switch (answer)
     {
@@ -54,6 +55,8 @@ while (answer != "done")
             bicycle.Show(bicycle);
             break;
 
+        case "done":
+            break;
 
         default:
             Console.WriteLine("Incorrect command. Please try again");
@@ -68,38 +71,44 @@ Deck.Show(hand);
 
 static void Macau(Deck deck)
 {
-    var hand1 = new List<Card>();
-    var hand2 = new List<Card>();
+    var players = new List<List<Card>>();
     var pile = new List<Card>();
-    bool turn = false;
+    int turn = -1;
     int state = 0;
     int penalty = 0;
     char demand = '0';
-    string change;
-    //bool attack = false;
+    int demandingPlayer = 0;
+    int waitingPlayer = -1;
+    int pause = 0;
+    string change = "1";
     for (int i = 0; i < 52; i++)
         deck.Shuffle();
-    //dealing cards
-    for (int i = 0; i < 5; i++)
+    Console.WriteLine("Ile graczy?");
+    int x = Convert.ToInt32(Console.ReadLine());
+    for (int i = 0; i < x; i++)
     {
-        hand1.Add(deck.Pick(1));
-        hand2.Add(deck.Pick(1));
+        var hand = new List<Card>();
+        players.Add(hand);
+    }
+    for (int j = 0; j < 5; j++) //dealing cards
+    {
+        foreach(List<Card> hand in players)
+            hand.Add(deck.Pick(1));
     }
     pile.Add(deck.Pick(1));
-    //game starts
-    while(hand1.Count() != 0 && hand2.Count() != 0)
+    do // game
     {
-        if (turn == false)
-        {
-            TurnMacau(hand1);
-            turn = true;
+        turn++;
+        if (turn == players.Count())
+            turn = 0;
+        if (turn == waitingPlayer && pause != 0) {
+            pause--;
+            if (pause == 0)
+                waitingPlayer = -1;
         }
         else
-        {
-            TurnMacau(hand2);
-            turn = false;
-        }
-    }
+            TurnMacau(players[turn]);
+    } while (players[turn].Count() != 0);
 
     void TurnMacau(List<Card> hand)
     {
@@ -138,6 +147,11 @@ static void Macau(Deck deck)
                 {
                     Console.Write("Nie możesz zagrać żadnej karty.");
                     //wait x turns
+                    if (pause > 1)
+                    {
+                        waitingPlayer = turn;
+                        pause--;
+                    }
                     state = 0;
                     return;
                 }
@@ -148,6 +162,8 @@ static void Macau(Deck deck)
                 {
                     Console.Write("Nie możesz zagrać żadnej karty.");
                     hand.Add(deck.Pick(1));
+                    if (demandingPlayer == turn)
+                        state = 0;
                     return;
                 }
                 break;
@@ -211,12 +227,14 @@ static void Macau(Deck deck)
 
             case '4':
                 state = 2;
+                pause++;
                 break;
 
             case 'J':
                 state = 3;
                 Console.WriteLine("Jakiego znaku żądasz?");
                 demand = Convert.ToChar(Console.Read());
+                demandingPlayer = turn;
                 break;
 
             case 'Q':
@@ -239,7 +257,11 @@ static void Macau(Deck deck)
             case 'A':
                 state = 6;
                 Console.WriteLine("Jakiego symbolu/koloru żądasz?");
-                change = Convert.ToString(Console.Read());
+                change = Convert.ToString(Console.ReadLine());
+                break;
+
+            default:
+                state = 0;
                 break;
         }
     }
@@ -275,6 +297,11 @@ static void Macau(Deck deck)
 
             case 5:
                 if (topCard.sign == card.sign)
+                    check = true;
+                break;
+
+            case 6:
+                if (topCard.sign == card.sign || change == card.symbol)
                     check = true;
                 break;
         }
@@ -352,15 +379,23 @@ public class Card
         sign = b;
     }
 
-    public Card(string a, char b, int c)
+    /*public Card(string a, char b, int c)
     {
         symbol = a;
         sign = b;
         back = c * 3;
-    }
+    }*/
 
     public override string ToString()
     {
         return this.sign + " of " + this.symbol;
     }
 }
+
+/*string ReadAny()
+{
+    string? isNull = Console.ReadLine();
+    string sentence = String.Empty;
+    sentence = isNull;
+    return sentence;
+}*/
