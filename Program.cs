@@ -23,7 +23,7 @@ while (answer != "done")
     Console.WriteLine("\"show\" to see the deck,");
     Console.WriteLine("\"done\" to finish playing.");
 
-    string? isNull = Console.ReadLine();
+    string isNull = Console.ReadLine();
     answer = isNull!;
     //answer = ReadAny();
 
@@ -78,12 +78,12 @@ static void Macau(Deck deck)
     int penalty = 0;
     char demand = '0';
     int demandingPlayer = 0;
-    int waitingPlayer = -1;
     int pause = 0;
+    int waitingPlayer = -1;
     string change = "1";
     for (int i = 0; i < 52; i++)
         deck.Shuffle();
-    Console.WriteLine("Ile graczy?");
+    Console.WriteLine("How many players?");
     int x = Convert.ToInt32(Console.ReadLine());
     for (int i = 0; i < x; i++)
     {
@@ -101,28 +101,32 @@ static void Macau(Deck deck)
         turn++;
         if (turn == players.Count())
             turn = 0;
-        if (turn == waitingPlayer && pause != 0) {
+        if (turn == waitingPlayer && pause != 0)
+        {
             pause--;
             if (pause == 0)
                 waitingPlayer = -1;
         }
         else
+        {
+            Console.WriteLine("Next is Player number " + (turn+1));
+            Console.WriteLine("Press Enter to continue.");
+            Console.ReadLine();
+            Console.Clear();
             TurnMacau(players[turn]);
+        }
     } while (players[turn].Count() != 0);
 
     void TurnMacau(List<Card> hand)
     {
         Card topCard = pile[pile.Count() - 1];
-        Console.WriteLine("To jest widoczna karta.");
-        Console.WriteLine(topCard);
-        Console.WriteLine("To jest twoja ręka.");
-        Deck.Show(hand);
+        TurnInfo(players, topCard);
         switch (state)
         {
             case 0: //neutral state
                 if (HandCheckMacau(hand, topCard) == false)
                 {
-                    Console.Write("Nie możesz zagrać żadnej karty.");
+                    Console.WriteLine("You cannot play any card.");
                     hand.Add(deck.Pick(1));
                     return;
                 }
@@ -131,7 +135,7 @@ static void Macau(Deck deck)
             case 1: //draw attack
                 if (HandAttackCheckMacau(hand, topCard) == false)
                 {
-                    Console.Write("Nie możesz zagrać żadnej karty.");
+                    Console.WriteLine("You cannot play any card.");
                     while (penalty > 0)
                     {
                         hand.Add(deck.Pick(1));
@@ -145,7 +149,7 @@ static void Macau(Deck deck)
             case 2: //pause attack
                 if (HandSignCheckMacau(hand, topCard) == false)
                 {
-                    Console.Write("Nie możesz zagrać żadnej karty.");
+                    Console.WriteLine("You cannot play any card.");
                     //wait x turns
                     if (pause > 1)
                     {
@@ -160,7 +164,7 @@ static void Macau(Deck deck)
             case 3: //jack's demand
                 if (HandDemandCheckMacau(hand) == false)
                 {
-                    Console.Write("Nie możesz zagrać żadnej karty.");
+                    Console.WriteLine("You cannot play any card.");
                     hand.Add(deck.Pick(1));
                     if (demandingPlayer == turn)
                         state = 0;
@@ -174,7 +178,7 @@ static void Macau(Deck deck)
             case 5: //king's attack
                 if (HandSignCheckMacau(hand, topCard) == false)
                 {
-                    Console.Write("Nie możesz zagrać żadnej karty.");
+                    Console.WriteLine("You cannot play any card.");
                     while (penalty > 0)
                     {
                         hand.Add(deck.Pick(1));
@@ -188,27 +192,30 @@ static void Macau(Deck deck)
             case 6: //ace's change
                 break;
         }
-        Console.WriteLine("Wybierz kartę (wpisując cyfrę zaczynając od 1), którą chcesz zagrać.");
+        Console.WriteLine("Choose a card (by typing a number starting from 1), which you'd like to play.");
         int choice = Convert.ToInt32(Console.ReadLine());
-        if (choice == 0) // zero draws a card either way
-        {
-            hand.Add(deck.Pick(1));
-            return;
-        }
-        if (CardCheckMacau(hand[choice - 1], topCard) == true)
-        {
-            Card playedCard = Deck.Pick(hand, choice);
-            pile.Add(playedCard);
-            CardIdMacau(playedCard);
-            while (HandSignCheckMacau(hand, pile[pile.Count() - 1]) == true)
+        do {
+            if (choice == 0) // zero draws a card either way
             {
-                Deck.Show(hand);
-                choice = Convert.ToInt32(Console.ReadLine());
-                playedCard = Deck.Pick(hand, choice);
+                hand.Add(deck.Pick(1));
+                return;
+            }
+            if (CardCheckMacau(hand[choice - 1], topCard) == true)
+            {
+                Card playedCard = Deck.Pick(hand, choice);
                 pile.Add(playedCard);
                 CardIdMacau(playedCard);
+                while (HandSignCheckMacau(hand, pile[pile.Count() - 1]) == true)
+                {
+                    Deck.Show(hand);
+                    choice = Convert.ToInt32(Console.ReadLine());
+                    playedCard = Deck.Pick(hand, choice);
+                    pile.Add(playedCard);
+                    CardIdMacau(playedCard);
+                }
             }
-        }
+        } while (CardCheckMacau(hand[choice - 1], topCard) == false);
+        Console.Clear();
     }
 
     void CardIdMacau(Card card)
@@ -362,6 +369,20 @@ static void Macau(Deck deck)
             }
         }
         return check;
+    }
+    
+    void TurnInfo(List<List<Card>> players, Card topCard)
+    {
+        int i = 1;
+        foreach (var hand in players)
+        {
+            Console.WriteLine("Player no." + i + " has " + hand.Count() + " cards.");
+            i++;
+        }
+        Console.WriteLine("This is the visible card.");
+        Console.WriteLine(topCard);
+        Console.WriteLine("This is your hand.");
+        Deck.Show(players[turn]);
     }
 }
 
