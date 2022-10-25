@@ -23,7 +23,7 @@ while (answer != "done")
     Console.WriteLine("\"show\" to see the deck,");
     Console.WriteLine("\"done\" to finish playing.");
 
-    string isNull = Console.ReadLine();
+    string? isNull = Console.ReadLine();
     answer = isNull!;
     //answer = ReadAny();
 
@@ -109,10 +109,8 @@ static void Macau(Deck deck)
         }
         else
         {
-            Console.WriteLine("Next is Player number " + (turn+1));
-            Console.WriteLine("Press Enter to continue.");
-            Console.ReadLine();
-            Console.Clear();
+            Console.WriteLine("Next is Player number " + (turn + 1));
+            Pause();
             TurnMacau(players[turn]);
         }
     } while (players[turn].Count() != 0);
@@ -128,11 +126,13 @@ static void Macau(Deck deck)
                 {
                     Console.WriteLine("You cannot play any card.");
                     hand.Add(deck.Pick(1));
+                    Pause();
                     return;
                 }
                 break;
 
             case 1: //draw attack
+                Console.WriteLine("Ongoing attack! You are about to draw " + penalty + " cards.");
                 if (HandAttackCheckMacau(hand, topCard) == false)
                 {
                     Console.WriteLine("You cannot play any card.");
@@ -142,11 +142,13 @@ static void Macau(Deck deck)
                         penalty--;
                     }
                     state = 0;
+                    Pause();
                     return;
                 }
                 break;
 
             case 2: //pause attack
+                Console.WriteLine("Ongoing attack! You are about to pause for " + pause + "turn(s).");
                 if (HandSignCheckMacau(hand, topCard) == false)
                 {
                     Console.WriteLine("You cannot play any card.");
@@ -157,17 +159,20 @@ static void Macau(Deck deck)
                         pause--;
                     }
                     state = 0;
+                    Pause();
                     return;
                 }
                 break;
 
             case 3: //jack's demand
+                Console.WriteLine("Ongoing demand! Player no. " + demandingPlayer + " demands " + demand + "'s.");
                 if (HandDemandCheckMacau(hand) == false)
                 {
                     Console.WriteLine("You cannot play any card.");
                     hand.Add(deck.Pick(1));
                     if (demandingPlayer == turn)
                         state = 0;
+                    Pause();
                     return;
                 }
                 break;
@@ -185,36 +190,81 @@ static void Macau(Deck deck)
                         penalty--;
                     }
                     state = 0;
+                    Pause();
                     return;
                 }
                 break;
 
             case 6: //ace's change
+                Console.WriteLine("Ongoing change! Symbol has been changed to " + change + "!");
+                if (HandAceCheckMacau(hand, topCard.sign, change) == false)
+                {
+                    Console.WriteLine("You cannot play any card.");
+                    hand.Add(deck.Pick(1));
+                    Pause();
+                    return;
+                }
                 break;
         }
-        Console.WriteLine("Choose a card (by typing a number starting from 1), which you'd like to play.");
-        int choice = Convert.ToInt32(Console.ReadLine());
-        do {
-            if (choice == 0) // zero draws a card either way
+        Console.WriteLine("Choose a card (by typing a number starting from 1), which you'd like to play. Type zero in order to draw a card anyway.");
+        int choice;
+        bool validity;
+        do
+        {
+            choice = Convert.ToInt32(Console.ReadLine());
+            if (choice == 0)
+                validity = true;
+            else
             {
-                hand.Add(deck.Pick(1));
-                return;
-            }
-            if (CardCheckMacau(hand[choice - 1], topCard) == true)
-            {
-                Card playedCard = Deck.Pick(hand, choice);
-                pile.Add(playedCard);
-                CardIdMacau(playedCard);
-                while (HandSignCheckMacau(hand, pile[pile.Count() - 1]) == true)
+                if (choice > 0 && choice <= players[turn].Count())
+                    if (CardCheckMacau(hand[choice - 1], topCard) == true)
+                        validity = true;
+                    else
+                    {
+                        validity = false;
+                        Console.WriteLine("You cannot play this card. Choose a different one.");
+                    }
+                else
                 {
-                    Deck.Show(hand);
-                    choice = Convert.ToInt32(Console.ReadLine());
-                    playedCard = Deck.Pick(hand, choice);
-                    pile.Add(playedCard);
-                    CardIdMacau(playedCard);
+                    validity = false;
+                    Console.WriteLine("You cannot play this card. Choose a different one.");
                 }
             }
-        } while (CardCheckMacau(hand[choice - 1], topCard) == false);
+        } while (validity == false);
+        if (choice == 0) // zero draws a card either way
+        {
+            hand.Add(deck.Pick(1));
+            return;
+        }
+        else
+        {
+            Card playedCard = Deck.Pick(hand, choice);
+            pile.Add(playedCard);
+            topCard = pile[pile.Count() - 1];
+            CardIdMacau(playedCard);
+            while (HandSignCheckMacau(hand, topCard) == true)
+            {
+                Deck.Show(hand);
+                Console.WriteLine("You can play more cards. Type 0 to end your turn.");
+                do
+                {
+                    choice = Convert.ToInt32(Console.ReadLine());
+                    if (choice >= 0 && choice <= players[turn].Count() && hand[choice - 1].sign == topCard.sign)
+                        validity = true;
+                    else
+                    {
+                        validity = false;
+                        Console.WriteLine("You cannot play this card. Choose a different one.");
+                    }
+                } while (validity == false);
+                if (choice == 0)
+                    return;
+                playedCard = Deck.Pick(hand, choice);
+                pile.Add(playedCard);
+                topCard = pile[pile.Count() - 1];
+                CardIdMacau(playedCard);
+            }
+        }
         Console.Clear();
     }
 
@@ -239,7 +289,7 @@ static void Macau(Deck deck)
 
             case 'J':
                 state = 3;
-                Console.WriteLine("Jakiego znaku żądasz?");
+                Console.WriteLine("What is your demand? (sign, from 5 to 10 (please type 1 instead of 10)");
                 demand = Convert.ToChar(Console.Read());
                 demandingPlayer = turn;
                 break;
@@ -263,8 +313,11 @@ static void Macau(Deck deck)
 
             case 'A':
                 state = 6;
-                Console.WriteLine("Jakiego symbolu/koloru żądasz?");
-                change = Convert.ToString(Console.ReadLine());
+                Console.WriteLine("What's the change? (symbol, chosen from hearts, diamonds, clubs and spades)");
+                do
+                {
+                    change = Convert.ToString(Console.ReadLine());
+                } while (change != "hearts" && change != "diamonds" && change != "clubs" && change != "spades");
                 break;
 
             default:
@@ -329,6 +382,20 @@ static void Macau(Deck deck)
         return check;
     }
 
+    bool HandAceCheckMacau(List<Card> hand, char topCardSign, string choice)
+    {
+        bool check = false;
+        for (int i = 0; i < hand.Count(); i++)
+        {
+            if (topCardSign == hand[i].sign || choice == hand[i].symbol)
+            {
+                check = true;
+                break;
+            }
+        }
+        return check;
+    }
+
     bool HandSignCheckMacau(List<Card> hand, Card topCard)
     {
         bool check = false;
@@ -383,6 +450,13 @@ static void Macau(Deck deck)
         Console.WriteLine(topCard);
         Console.WriteLine("This is your hand.");
         Deck.Show(players[turn]);
+    }
+
+    void Pause()
+    {
+        Console.WriteLine("Press Enter to continue.");
+        Console.ReadLine();
+        Console.Clear();
     }
 }
 
