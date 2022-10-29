@@ -249,12 +249,23 @@ static void Macau(Deck deck)
                 do
                 {
                     choice = Convert.ToInt32(Console.ReadLine());
-                    if (choice >= 0 && choice <= players[turn].Count() && hand[choice - 1].sign == topCard.sign)
-                        validity = true;
+                    if (choice == 0)
+                        return;
                     else
                     {
-                        validity = false;
-                        Console.WriteLine("You cannot play this card. Choose a different one.");
+                        if (choice >= 0 && choice <= players[turn].Count())
+                            if (hand[choice - 1].sign == topCard.sign)
+                                validity = true;
+                            else
+                            {
+                                validity = false;
+                                Console.WriteLine("You cannot play this card. Choose a different one.");
+                            }
+                        else
+                        {
+                            validity = false;
+                            Console.WriteLine("You cannot play this card. Choose a different one.");
+                        }
                     }
                 } while (validity == false);
                 if (choice == 0)
