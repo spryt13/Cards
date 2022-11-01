@@ -77,7 +77,7 @@ static void Macau(Deck deck)
     int state = 0;
     int penalty = 0;
     char demand = '0';
-    int demandingPlayer = 0;
+    int demandingPlayer = -1;
     int pause = 0;
     int waitingPlayer = -1;
     string change = "1";
@@ -148,7 +148,7 @@ static void Macau(Deck deck)
                 break;
 
             case 2: //pause attack
-                Console.WriteLine("Ongoing attack! You are about to pause for " + pause + "turn(s).");
+                Console.WriteLine("Ongoing attack! You are about to pause for " + pause + " turn(s).");
                 if (HandSignCheckMacau(hand, topCard) == false)
                 {
                     Console.WriteLine("You cannot play any card.");
@@ -165,13 +165,16 @@ static void Macau(Deck deck)
                 break;
 
             case 3: //jack's demand
-                Console.WriteLine("Ongoing demand! Player no. " + demandingPlayer + " demands " + demand + "'s.");
+                Console.WriteLine("Ongoing demand! Player no. " + (demandingPlayer + 1) + " demands " + demand + "'s.");
                 if (HandDemandCheckMacau(hand) == false)
                 {
                     Console.WriteLine("You cannot play any card.");
                     hand.Add(deck.Pick(1));
                     if (demandingPlayer == turn)
+                    {
+                        demandingPlayer = -1;
                         state = 0;
+                    }
                     Pause();
                     return;
                 }
@@ -301,7 +304,10 @@ static void Macau(Deck deck)
             case 'J':
                 state = 3;
                 Console.WriteLine("What is your demand? (sign, from 5 to 10 (please type 1 instead of 10)");
-                demand = Convert.ToChar(Console.Read());
+                do
+                {
+                    demand = Convert.ToChar(Console.ReadLine());
+                } while (demand != '5' && demand != '6' && demand != '7' && demand != '8' && demand != '9' && demand != '1') ;
                 demandingPlayer = turn;
                 break;
 
@@ -332,7 +338,8 @@ static void Macau(Deck deck)
                 break;
 
             default:
-                state = 0;
+                if (demandingPlayer == -1)
+                    state = 0;
                 break;
         }
     }
@@ -343,7 +350,7 @@ static void Macau(Deck deck)
         switch (state)
         {
             case 0:
-                if (topCard.sign == card.sign || topCard.symbol == card.symbol)
+                if (topCard.sign == card.sign || topCard.symbol == card.symbol || card.sign == 'Q')
                     check = true;
                 break;
 
@@ -358,7 +365,7 @@ static void Macau(Deck deck)
                 break;
 
             case 3:
-                if (topCard.sign == card.sign || card.sign == 'J')
+                if (demand == card.sign || card.sign == 'J')
                     check = true;
                 break;
 
@@ -384,7 +391,7 @@ static void Macau(Deck deck)
         bool check = false;
         for (int i = 0; i < hand.Count(); i++)
         {
-            if (topCard.sign == hand[i].sign || topCard.symbol == hand[i].symbol)
+            if (topCard.sign == hand[i].sign || topCard.symbol == hand[i].symbol || hand[i].sign == 'Q')
             {
                 check = true;
                 break;
