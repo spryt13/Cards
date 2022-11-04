@@ -24,4 +24,22 @@ Additional mentions about the rules:
 * Queens does not cancel any action cards.
 * Action Kings cannot be forwarded by 2s and 3s and vice-versa.
 
-Please keep in mind that since the application is still in development, some of the mentioned functionality may not be implemented yet.
+## Game's implementation
+
+Created application does not include the game only. As the initial idea of making an application in C# was to create a deck of cards and allow some ordinary operation using it, a main menu interface is created from where User can proceed to performing any action desired including playing Macau game. This option of displaying possibilities allows extending application's variety of playable games or other actions that can be performed with a deck of cards. In current state, beside playing Macau, User is able to try basic operations including shuffling, picking a card out of the deck or displaying the order of cards in the deck. The implementation of the game of Macau itself consists of four parts:
+* preparation of the game,
+* check of Player's hand,
+* choice and verification of played cards,
+* application of effects.
+
+### Preparation of the game
+
+This simple stage of the game uses mostly simple method calls and loops in order to supply Players with necessary setup for playing the game. After shuffling the deck and gaining the amount of players taking part in the game, the application generates a list of cards for each Player (hand) and deals appropriate amount of cards so that every Player has 5 cards at the beginning of the game. Lastly, one card from top is picked as a start of the pile and the game is ready to go. From that point on Players will play in turn until one of them runs out of cards on hand.
+
+### Check of Player's hand
+
+Before Player has any ability of performing actions during his/her turn, a check of Player's hand is performed. This operation has the target of immediately verifying if any action can be performed and ending the turn if no actions are possible. In order to do so, the application needs to understand different situations during the game and apply different rules for this check. This is done by using *state* function and *state* variable which redirect application to adequate method, where each card is examinated separately. Whenever there's any card that can be played under current circumstances, the turn may continue and let the Player choose which card should be played.
+
+### Choice and verification of played cards
+
+### Application of effects
