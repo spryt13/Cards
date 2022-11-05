@@ -114,6 +114,7 @@ static void Macau(Deck deck)
             TurnMacau(players[turn]);
         }
     } while (players[turn].Count() != 0);
+    Console.WriteLine("Congratulations! Player no. " + (turn + 1) + " has won the game!");
 
     void TurnMacau(List<Card> hand)
     {
@@ -152,7 +153,6 @@ static void Macau(Deck deck)
                 if (HandSignCheckMacau(hand, topCard) == false)
                 {
                     Console.WriteLine("You cannot play any card.");
-                    //wait x turns
                     if (pause > 1)
                     {
                         waitingPlayer = turn;
@@ -208,8 +208,8 @@ static void Macau(Deck deck)
                     return;
                 }
                 break;
-        }
-        Console.WriteLine("Choose a card (by typing a number starting from 1), which you'd like to play. Type zero in order to draw a card anyway.");
+        } // verification: Can any card be played during certain state?
+        Console.WriteLine("Choose a card (by typing a number starting from 1), which you'd like to play. Type 0 in order to draw a card anyway.");
         int choice;
         bool validity;
         do
@@ -342,7 +342,7 @@ static void Macau(Deck deck)
                     state = 0;
                 break;
         }
-    }
+    } // verification: What does the chosen card do?
 
     bool CardCheckMacau(Card card, Card topCard)
     {
@@ -384,7 +384,7 @@ static void Macau(Deck deck)
                 break;
         }
         return check;
-    }
+    } // verification: Can chosen card be played?
 
     bool HandCheckMacau(List<Card> hand, Card topCard)
     {
@@ -398,7 +398,7 @@ static void Macau(Deck deck)
             }
         }
         return check;
-    }
+    } // card's playability during state 0 (neutral)
 
     bool HandAceCheckMacau(List<Card> hand, char topCardSign, string choice)
     {
@@ -412,7 +412,7 @@ static void Macau(Deck deck)
             }
         }
         return check;
-    }
+    } // card's playability during state 6 (aces)
 
     bool HandSignCheckMacau(List<Card> hand, Card topCard)
     {
@@ -426,7 +426,7 @@ static void Macau(Deck deck)
             }
         }
         return check;
-    }
+    } // card's playability during state 2 (4s) and 5 (kings)
 
     bool HandAttackCheckMacau(List<Card> hand, Card topCard)
     {
@@ -440,7 +440,7 @@ static void Macau(Deck deck)
             }
         }
         return check;
-    }
+    } // card's playability during state 1 (2s and 3s)
 
     bool HandDemandCheckMacau(List<Card> hand)
     {
@@ -454,8 +454,10 @@ static void Macau(Deck deck)
             }
         }
         return check;
-    }
-    
+    } // card's playability during state 3 (jacks)
+
+    // queens don't require a playability check, anything can be played!
+
     void TurnInfo(List<List<Card>> players, Card topCard)
     {
         int i = 1;
@@ -468,14 +470,14 @@ static void Macau(Deck deck)
         Console.WriteLine(topCard);
         Console.WriteLine("This is your hand.");
         Deck.Show(players[turn]);
-    }
+    } // basic player's info
 
     void Pause()
     {
         Console.WriteLine("Press Enter to continue.");
         Console.ReadLine();
         Console.Clear();
-    }
+    } // pause and clear screen of the program
 }
 
 
