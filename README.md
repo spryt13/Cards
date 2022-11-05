@@ -35,7 +35,7 @@ Created application does not include the game only. As the initial idea of makin
 
 ### Preparation of the game
 
-This simple stage of the game uses mostly simple method calls and loops in order to supply Players with necessary setup for playing the game. After shuffling the deck and gaining the amount of players taking part in the game, the application generates a list of cards for each Player (hand) and deals appropriate amount of cards so that every Player has 5 cards at the beginning of the game. Lastly, one card from top is picked as a start of the pile and the game is ready to go. From that point on Players will play in turn until one of them runs out of cards on hand.
+This simple stage of the game uses mostly simple method calls and loops in order to supply Players with necessary setup for playing the game. After shuffling the deck and gaining the amount of players taking part in the game, the application generates a list of cards for each Player (hand) and deals appropriate amount of cards so that every Player has 5 cards at the beginning of the game. Lastly, one card from top is picked as a start of the pile and the game is ready to go. From that point on Players will play in turn until one of them runs out of cards on hand. Overall turn execution is performed using `TurnMacau` method.
 
 ### Check of Player's hand
 
@@ -47,10 +47,15 @@ Only once the application knows that there are cards that can be legally played 
 * is the entered number different than zero?
 * is the entered number pointing at a card in hand?
 * is the selected card legal in current situation?
-Typing zero instead of a positive number is the designed way of not playing a card and ending turn as if The Player couldn't play anything. This can be handled differently and simply with an *if* function in order to quickly end turn and proceed to the next player. Second issue obviously appears whenever something other than zero is entered. Reason for this is that the input must point the application to a certain card in hand. When this is accomplished, the card itself is verified once again in terms of playability. As much as these two issues can also be handled with *if* functions, the key to assuring the stability of the application is to seperate the operations. This ensures that given input can define which card is chosen and a verification of a card can be conducted.
+
+Typing zero instead of a positive number is the designed way of not playing a card and ending turn as if The Player couldn't play anything. This can be handled differently and simply with an `if (choice == 0)` function in order to quickly end turn and proceed to the next player. Second issue obviously appears whenever something other than zero is entered. Reason for this is that the input must point the application to a certain card in hand. When this is accomplished, the card itself is verified once again in terms of playability. As much as these two issues can also be handled with *if* functions, the key to assuring the stability of the application is to seperate the operations. This ensures that given input can define which card is chosen and a verification of a card can be conducted.
+
+`if (choice > 0 && choice <= players[turn].Count())`
+
+`if (CardCheckMacau(hand[choice - 1], topCard) == true)`
 
 Playing more than a single card during turn is executed in the same manner. The only difference can be visible in verification, where different rules need to be used in order to confirm validity of the chosen card.
 
 ### Application of effects
 
-Since the Player has decided on which card to play and the application has confirmed that the card is allowed to be put onto the top of the discard pile, the game may change it's *state* based on what card exactly is being played. In order to do so, a method *CardIDMacau* is designed. This method is capable of "reading" the card using *switch* function and *state* variable, change the state of the game whenever an action card is played and modify appropriate values responsible for all kinds of penalties and demands. Once the cards are played and their effects acknowledged, Player ends his/her turn and the game can continue.
+Since the Player has decided on which card to play and the application has confirmed that the card is allowed to be put onto the top of the discard pile, the game may change it's *state* based on what card exactly is being played. In order to do so, a method `CardIDMacau` is designed. This method is capable of "reading" the card using *switch* function and *state* variable, change the state of the game whenever an action card is played and modify appropriate values responsible for all kinds of penalties and demands. Once the cards are played and their effects acknowledged, Player ends his/her turn and the game can continue.
